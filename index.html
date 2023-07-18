@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Image Uploader and Viewer with FER</title>
+    <title>Emotion Detector</title>
 </head>
 <body>
     <input type="file" id="upload" accept="image/*">
@@ -14,14 +14,22 @@
         function analyzeEmotion() {
             const imageElement = document.getElementById('image-preview');
             const imageSrc = imageElement.src;
+            
+            // Convert the image data to base64
+            const canvas = document.createElement("canvas");
+            canvas.width = imageElement.width;
+            canvas.height = imageElement.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL().split(',')[1];
 
-            // Send the image to the server for FER analysis
+            // Send the image data to the Flask app for FER analysis
             fetch('/analyze', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ 'imageSrc': imageSrc })
+                body: JSON.stringify({ 'imageData': imageData })
             })
             .then(response => response.json())
             .then(data => {
