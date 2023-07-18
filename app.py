@@ -1,27 +1,28 @@
-import webview
+from flask import Flask, request, jsonify
 import cv2
 from deepface import DeepFace
 
-def process_image(image_path):
-    # Load the image and convert it to grayscale
-    image = cv2.imread(image_path)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+app = Flask(__name__)
 
-    # Detect faces in the image
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    faces = face_cascade.detectMultiScale(gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+@app.route('/')
+def index():
+    # Return the index.html file
+    return open('index.html').read()
 
-    # If a face is detected, perform emotion recognition
-    if len(faces) > 0:
-        emotion_predictions = DeepFace.analyze(image_path, actions=['emotion'])
-        emotions = emotion_predictions['emotion']
-        top_emotion = max(emotions, key=emotions.get)
-        print("Top Emotion:", top_emotion)
-    else:
-        print("No face detected in the image.")
+@app.route('/analyze', methods=['POST'])
+def analyze_emotion():
+    data = request.json
+    image_src = data['imageSrc']
 
-def create_window():
-    webview.create_window("Image Uploader and Viewer", "index.html", width=600, height=400, js_api=process_image)
+    # Perform FER on the image
+    # Code for FER (similar to the previous example)
+
+    # For demonstration purposes, we'll return a random emotion as the result
+    # Replace this with the actual FER code
+    emotions = ['happy', 'sad', 'angry', 'neutral']
+    top_emotion = random.choice(emotions)
+
+    return jsonify({'top_emotion': top_emotion})
 
 if __name__ == "__main__":
-    create_window()
+    app.run()
